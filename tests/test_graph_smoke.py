@@ -1,7 +1,7 @@
 """End-to-end test of the assembled graph with all I/O mocked.
 
-This test verifies the graph topology: parallel branches converge at reflect,
-reflect routes to synthesize on first iteration sufficient=True.
+This test verifies the graph topology: parallel branches converge directly at
+synthesize (V1 ships without the reflection loop).
 """
 
 from unittest.mock import MagicMock
@@ -44,13 +44,12 @@ def test_graph_runs_end_to_end(monkeypatch, tmp_path):
     # Reports dir
     monkeypatch.setattr("repo_analyzer.nodes.synthesize.REPORTS_DIR", tmp_path)
 
-    # Mock LLM with staged responses (order: plan -> analyze_code -> find_similar -> reflect)
+    # Mock LLM with staged responses (order: plan -> analyze_code -> find_similar)
     fake_llm = _llm_with_responses([
         {"files_to_read": ["main.py"], "similar_repos_query": "test", "web_queries": []},  # plan
         {"path": "main.py", "summary": "entry", "quality_notes": []},                       # analyze_code
         {"full_name": "a/b", "description": "x", "stars": 100,                              # find_similar
          "why_similar": "test", "differentiator": "diff"},
-        {"sufficient": True, "gaps": [], "rerun": ""},                                      # reflect
     ])
 
     # Each node imports `get_chat_model` via `from repo_analyzer.llm import get_chat_model`,
@@ -62,7 +61,6 @@ def test_graph_runs_end_to_end(monkeypatch, tmp_path):
         "repo_analyzer.nodes.analyze_code",
         "repo_analyzer.nodes.find_similar",
         "repo_analyzer.nodes.web_context",
-        "repo_analyzer.nodes.reflect",
         "repo_analyzer.nodes.synthesize",
     ):
         monkeypatch.setattr(f"{mod}.get_chat_model", lambda: fake_llm)

@@ -50,9 +50,7 @@ class State(TypedDict, total=False):
     similar_repos: Annotated[list[SimilarRepo], add]
     web_snippets: Annotated[list[WebSnippet], add]
 
-    reflection_iteration: int
     gaps: list[str]
-    rerun_branch: str
 
     report_markdown: str
     report_path: str
