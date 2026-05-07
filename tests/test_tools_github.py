@@ -43,6 +43,18 @@ def test_fetch_raw_file_decodes_base64():
 
 
 @respx.mock
+def test_fetch_raw_file_falls_back_to_raw_url_for_large_files():
+    respx.get("https://api.github.com/repos/o/r/contents/big.py").mock(
+        return_value=httpx.Response(200, json={"content": None, "encoding": None})
+    )
+    respx.get("https://raw.githubusercontent.com/o/r/HEAD/big.py").mock(
+        return_value=httpx.Response(200, text="big content here")
+    )
+    content = gh.fetch_raw_file("o", "r", "big.py")
+    assert content == "big content here"
+
+
+@respx.mock
 def test_search_repos_returns_top_n():
     respx.get("https://api.github.com/search/repositories").mock(
         return_value=httpx.Response(200, json={"items": [

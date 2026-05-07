@@ -6,8 +6,13 @@ from typing import Any
 
 from repo_analyzer.tools import github
 
-MANIFEST_FILES = ["package.json", "pyproject.toml", "Cargo.toml", "go.mod", "pom.xml", "build.gradle"]
-URL_RE = re.compile(r"github\.com/([^/]+)/([^/]+?)/?$")
+MANIFEST_FILES = [
+    "package.json", "pyproject.toml", "Cargo.toml",
+    "go.mod", "pom.xml", "build.gradle", "build.gradle.kts",
+]
+URL_RE = re.compile(
+    r"github\.com[/:]([^/]+)/([^/\s]+?)(?:\.git)?(?:/.*)?$"
+)
 
 
 def _parse_url(url: str) -> tuple[str, str]:

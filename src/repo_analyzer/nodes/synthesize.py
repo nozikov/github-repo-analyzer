@@ -1,6 +1,7 @@
 """synthesize node: produce final markdown report and save to file."""
 
 import json
+import logging
 from datetime import datetime
 from pathlib import Path
 
@@ -10,6 +11,14 @@ from repo_analyzer.llm import get_chat_model
 from repo_analyzer.prompts.synthesize import PROMPT
 
 REPORTS_DIR = Path("reports")
+
+log = logging.getLogger(__name__)
+
+REQUIRED_SECTIONS = (
+    "## 1. Tech due-diligence",
+    "## 2. Рекомендации автору",
+    "## 3. Идеи поверх",
+)
 
 
 def _fmt_list(items: list, key_order: list[str]) -> str:
@@ -37,6 +46,10 @@ def synthesize(state: dict) -> dict:
     )
     msg = llm.invoke(messages)
     markdown = msg.content if hasattr(msg, "content") else str(msg)
+
+    missing = [s for s in REQUIRED_SECTIONS if s not in markdown]
+    if missing:
+        log.warning("synthesize output missing sections: %s", missing)
 
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     date = datetime.utcnow().strftime("%Y-%m-%d")

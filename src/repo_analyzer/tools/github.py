@@ -71,11 +71,19 @@ def fetch_repo_meta(owner: str, name: str) -> dict[str, Any]:
 
 
 def fetch_raw_file(owner: str, name: str, path: str) -> str:
-    """Return file content (UTF-8)."""
+    """Return file content (UTF-8). Falls back to raw URL for files >1MB."""
     data = _get(f"{API}/repos/{owner}/{name}/contents/{path}").json()
-    if data.get("encoding") == "base64":
-        return base64.b64decode(data.get("content", "")).decode("utf-8", errors="replace")
-    return data.get("content", "")
+    content = data.get("content")
+    encoding = data.get("encoding")
+    if content and encoding == "base64":
+        return base64.b64decode(content).decode("utf-8", errors="replace")
+    # File too large for contents API — use raw URL
+    raw_url = f"https://raw.githubusercontent.com/{owner}/{name}/HEAD/{path}"
+    with _client() as c:
+        r = c.get(raw_url)
+        if r.status_code == 200:
+            return r.text
+    return ""
 
 
 def search_repos(query: str, limit: int = 10) -> list[dict[str, Any]]:
