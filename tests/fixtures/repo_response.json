@@ -1,0 +1,9 @@
+{
+  "name": "typer",
+  "full_name": "tiangolo/typer",
+  "description": "Typer, build great CLIs.",
+  "owner": {"login": "tiangolo"},
+  "stargazers_count": 15000,
+  "language": "Python",
+  "topics": ["cli", "python"]
+}
