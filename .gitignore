@@ -10,3 +10,4 @@ reports/*
 !reports/.gitkeep
 .idea/
 .vscode/
+.claude/
