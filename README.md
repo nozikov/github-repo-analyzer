@@ -54,6 +54,21 @@ flowchart TD
 
 Полное описание архитектуры, контракты узлов, обработка ошибок и roadmap — в [docs/architecture.md](docs/architecture.md).
 
+## Трассировка работы агента (опционально)
+
+Если хочется видеть, **что именно делает агент на каждом шаге** — входы/выходы каждого узла, тайминги, токены и стоимость каждого LLM-вызова — подключи [LangSmith](https://smith.langchain.com/). Бесплатный tier хватит с большим запасом.
+
+1. Зарегистрируйся, создай API-ключ в Settings.
+2. Раскомментируй три строки в `.env`:
+   ```
+   LANGSMITH_TRACING=true
+   LANGSMITH_API_KEY=lsv2_...
+   LANGSMITH_PROJECT=github-repo-analyzer
+   ```
+3. Запусти агента как обычно. В терминале появится `LangSmith tracing enabled — project: github-repo-analyzer`. Открой проект в UI — каждый прогон будет деревом узлов с деталями.
+
+Никакого кода менять не нужно — LangChain автоматически подхватывает env-переменные.
+
 ## Тесты
 
 ```bash

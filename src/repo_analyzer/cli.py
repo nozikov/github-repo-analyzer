@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 import sys
 
 from dotenv import load_dotenv
@@ -23,6 +24,10 @@ def main() -> None:
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
+
+    if os.environ.get("LANGSMITH_TRACING", "").lower() in ("true", "1"):
+        project = os.environ.get("LANGSMITH_PROJECT", "default")
+        print(f"LangSmith tracing enabled — project: {project}", flush=True)
 
     print(f"Analyzing {args.repo_url} ...", flush=True)
     graph = build_graph()
